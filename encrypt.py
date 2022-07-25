@@ -3,7 +3,7 @@ from distutils.core import setup
 from Cython.Build import cythonize
 
 class Encryptor():
-    def __init__(self, build_dir=None, except_path=[]):
+    def __init__(self, work_dir=os.getcwd(), build_dir="build", except_path=[]):
         # platform consistency
         if platform.system() == "Windows":
             self.suffix = "pyd"
@@ -13,18 +13,22 @@ class Encryptor():
             raise Exception("Platform not supported! Currently supports: Windows and Linux.")
 
         self.start_time = time.time()
-        self.build_dir = build_dir if build_dir is not None else "build"
 
+        self.work_dir = work_dir
+        self.build_dir = build_dir
         self.except_path = [os.path.abspath(path) for path in except_path]
         self.except_path.append(os.path.abspath(self.build_dir)) # to be discussed
         
         self.py_file_list = []
 
-    def traverse(self, base_path, clean):
+    def traverse(self, base_path=None, clean=False):
+        if base_path is None:
+            base_path = self.work_dir
+
         for path in os.listdir(base_path):
             full_path = os.path.join(base_path, path)
 
-            if full_path in self.except_path:
+            if os.path.abspath(full_path) in self.except_path:
                 continue
 
             elif os.path.isdir(full_path):
@@ -57,20 +61,20 @@ class Encryptor():
 
     def encrypt(self):
         # traverse directories, find py fils and compile
-        self.traverse(os.path.abspath("."), clean=False)
+        self.traverse()
         setup(ext_modules=cythonize(self.py_file_list, language_level = "3"), \
             script_args=["build_ext", "-b", self.build_dir])
         
         # clean up intermediate files
-        self.traverse(os.path.abspath("."), clean=True)
+        self.traverse(clean=True)
 
         # rename pyd files (or .so files)
         self.rename(self.build_dir)
 
 
 if __name__ == "__main__":
-    encryptor = Encryptor(except_path=["mish-cuda"])
-    encryptor.traverse(os.path.abspath("."), clean=True)
-    print("\n".join(encryptor.py_file_list))
-    print(len(encryptor.py_file_list))
-    # encryptor.encrypt()
+    encryptor = Encryptor(work_dir="Data_Process", except_path=["mish-cuda"])
+    # encryptor.traverse()
+    # print("\n".join(encryptor.py_file_list))
+    # print(len(encryptor.py_file_list))
+    encryptor.encrypt()
