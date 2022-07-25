@@ -1,9 +1,10 @@
 import os, time, platform
+from argparse import ArgumentParser
 from setuptools import setup
 from Cython.Build import cythonize
 
 class Encryptor():
-    def __init__(self, work_dir=os.getcwd(), build_dir="build", except_path=[]):
+    def __init__(self, work_dir=".", build_dir="build", except_path=[]):
         # platform consistency
         if platform.system() == "Windows":
             self.suffix = "pyd"
@@ -42,7 +43,7 @@ class Encryptor():
                     os.remove(full_path)
 
                 elif path_name_split[-1] in ("py", "pyx") and not path.startswith("__") \
-                    and path != __file__.split("/")[-1]:
+                    and path != __file__.split("\\")[-1] and path != __file__.split("/")[-1]:
                     self.py_file_list.append(full_path)
             
 
@@ -73,8 +74,15 @@ class Encryptor():
 
 
 if __name__ == "__main__":
-    encryptor = Encryptor(work_dir="Data_Process", except_path=["mish-cuda"])
-    # encryptor.traverse()
-    # print("\n".join(encryptor.py_file_list))
-    # print(len(encryptor.py_file_list))
-    encryptor.encrypt()
+    parser = ArgumentParser()
+    parser.add_argument("-w", default=".", help="Working directory which you want to \
+        encrypt", required=False)
+    parser.add_argument("-e", default=[], nargs='*', help="Exception directories and files \
+        that you don't want to encrypt", required=False)
+    args = vars(parser.parse_args())
+    
+    encryptor = Encryptor(work_dir=args["w"], except_path=args["e"])
+    encryptor.traverse()
+    print("\n".join(encryptor.py_file_list))
+    print(len(encryptor.py_file_list))
+    # encryptor.encrypt()
