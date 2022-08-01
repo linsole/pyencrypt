@@ -27,16 +27,19 @@ The second command is cited from https://stackoverflow.com/a/63359548.
 
 ## Get Started
 
-Download the encrypt.py file and execute the file in command line. Pass arguments to specify working directory and exception path if necessary.
+Download the encrypt.py file and execute the file in command line. Pass arguments to specify working directory and exception path if necessary. __Passed arguments can either be absolute or relative paths to the current working directory.__
 
 ```bash
-python encrypt.py -w "working directory" -e "exception path"
+python encrypt.py -w "working directory" -e "exception path" -b "build location"
 ```
 
-The __working directory__ is the directory that the script will work on to encrypt all the .py files in it. By defalut it is the current working directory.
-The __exception paths__ are directories or file paths that you don't want to encrypt. If you have multiple directories or file paths, separate them by spaces.
+The __working directory__ is the directory that the script will work on to encrypt all the .py files in it. __By default__ it is the current working directory.
 
-After encrypting, all the pyd files should resides in "build" directory as the following example. The script itself won't be encrypted.
+The __exception path__ are directories or file paths that you don't want to encrypt. If you have multiple directories or file paths, separate them by spaces. __By default__ is is an empty list.
+
+The __build location__ is the location where your build results reside in. __By default__ It is "build" in the current working directory. (By the way, when __passing relative path__, Cython will automatically create "build" directory and store some intermediate files even if you specify the build location. Remove them by hand if you don't like it.)
+
+After encrypting, the .pyd (or .so) files should reside in build location. The script itself won't be encrypted. The following is an example with default build location.
 
 ```bash
 └── YOUR PROJECT
@@ -63,11 +66,13 @@ After encrypting, all the pyd files should resides in "build" directory as the f
     └── ...
 ```
 
-If you find some .pyd files aren't in the right subfolders, it probably because you are missing a \_\_init__.py in the module folder.
+If you find some .pyd files aren't in the right subfolders, it probably because you are missing a \_\_init__.py in the module folder of python source code.
 
 
 ## Acknowledgement
 
 The script is inspired by the following blog and repository:
+
 https://zhuanlan.zhihu.com/p/83687939
+
 https://github.com/Pranjalab/pyencrypt

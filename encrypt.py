@@ -45,7 +45,7 @@ class Encryptor():
                     and os.stat(full_path).st_mtime > self.start_time:
                     os.remove(full_path) # clean up intermediate files
 
-                elif path_name_split[-1] in ("py", "pyx") and not path.startswith("__") \
+                elif not clean and path_name_split[-1] in ("py", "pyx") and not path.startswith("__") \
                     and path != __file__.split("\\")[-1] and path != __file__.split("/")[-1]:
                     self.py_file_list.append(full_path)
             
@@ -91,11 +91,13 @@ if __name__ == "__main__":
         files", required=False)
     args = vars(parser.parse_args())
     
+    # start encryption
     encryptor = Encryptor(work_dir=args["w"], except_path=args["e"], build_dir=args["b"])
-    encryptor.traverse()
-    print("\n".join(encryptor.py_file_list))
-    print(len(encryptor.py_file_list))
-    
-    # uncomment below to encrypt
     encryptor.encrypt()
-    print(f"\nENCRYPTION COMPLETE! \nThe results are in: {args['b']}")
+
+    # show encrypted files
+    print("\nEncrypted files:")
+    print("\n".join(encryptor.py_file_list))
+    print(f"{len(encryptor.py_file_list)} files in total.\n")
+    print(f"ENCRYPTION COMPLETE!\nThe results are in: {args['b']}\n")
+    
